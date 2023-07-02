@@ -1,3 +1,3 @@
 # Noting
 
-Just an app to store your notes. This app uses Firebase for user verification.
+Just an app to store your notes. This app uses Firebase.
