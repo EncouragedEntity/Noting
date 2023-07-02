@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, avoid_printRegisterView
 import 'package:flutter/material.dart';
+import 'package:noting/Views/notes/create_update_note_view.dart';
 import 'package:noting/constants/colors.dart';
 import 'package:noting/services/auth/auth_service.dart';
 import 'package:noting/widgets/all_widgets.dart';
@@ -39,6 +40,7 @@ void main() async {
       AppRoutes.register: (context) => const RegisterView(),
       AppRoutes.notes: (context) => const NotesView(),
       AppRoutes.mailVerify: (context) => const VerifyEmailView(),
+      AppRoutes.createUpdate: (context) => const CreateUpdateNoteView(),
     },
   ));
 } 

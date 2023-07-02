@@ -3,4 +3,5 @@ class AppRoutes {
   static const register = '/register/';
   static const notes = '/notes/';
   static const mailVerify = '/mail-verify/';
+  static const createUpdate = '/notes/create-update';
 }
