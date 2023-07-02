@@ -39,6 +39,19 @@ class FirebaseCloudStorage {
     });
   }
 
+  Future<void> updateNote({
+    required String documentId,
+    required String newContent,
+  }) async {
+    try{
+    await notes.doc(documentId).update({CloudConst.contentFieldName: newContent});
+    }
+    catch(e)
+    {
+      throw CouldNotUpdateNoteException();
+    }
+  }
+
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
   FirebaseCloudStorage._sharedInstance();
