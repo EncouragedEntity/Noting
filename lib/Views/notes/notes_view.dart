@@ -52,11 +52,21 @@ class _NotesViewState extends State<NotesView> {
                     );
                   }
                   break;
-                  default: break;
+                case MenuAction.deleteAllNotes:
+                  {
+                    _notesService.deleteAllNotes();
+                  }
+                  break;
+                default:
+                  break;
               }
             },
             itemBuilder: (context) {
               return const [
+                PopupMenuItem(
+                  value: MenuAction.deleteAllNotes,
+                  child: Text('Delete all'),
+                ),
                 PopupMenuItem(
                   value: MenuAction.logOut,
                   child: Text('Log out'),
@@ -94,7 +104,8 @@ class _NotesViewState extends State<NotesView> {
                 }
               }
               break;
-              default: break;
+            default:
+              break;
           }
           return const Center(child: CircularProgressIndicator());
         },

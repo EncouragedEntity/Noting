@@ -63,6 +63,21 @@ class FirebaseCloudStorage {
     }
   }
 
+  Future<void> deleteAllNotes() async {
+    try {
+      final notesSnapshot = await notes.get();
+      final batch = FirebaseFirestore.instance.batch();
+
+      for (final noteDoc in notesSnapshot.docs) {
+        batch.delete(noteDoc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw CouldNotDeleteNoteException();
+    }
+  }
+
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
   FirebaseCloudStorage._sharedInstance();

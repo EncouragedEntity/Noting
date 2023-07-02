@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noting/constants/notes.dart';
 import 'package:noting/services/cloud/cloud_note.dart';
 
 typedef NoteCallBack = void Function(CloudNote note);
@@ -17,29 +18,43 @@ class NotesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (notes.isEmpty) {
+      return const Center(
+        child: Text('Empty here'),
+      );
+    }
     return ListView.builder(
         itemCount: notes.length,
         itemBuilder: ((context, index) {
           final note = notes.elementAt(index);
 
-          return ListTile(
-            onTap: () {
-              onTap(note);
-            },
-            title: Text(
-              note.content,
-              maxLines: 1,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
+          return Container(
+            decoration: BoxDecoration(
+              border: const Border(
+                  bottom: BorderSide(width: 1, color: Colors.black)),
+              color: Colors.grey.shade200,
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () async {
-                final shouldDelete = await showDeleteDialog(context);
-                if (shouldDelete ?? false) {
-                  onDeleteNote(note);
-                }
+            child: ListTile(
+              onTap: () {
+                onTap(note);
               },
+              title: Text(
+                note.content.length > NoteConst.maxTitleLen
+                    ? '${note.content.substring(0, NoteConst.maxTitleLen)}...'
+                    : note.content,
+                maxLines: 1,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  final shouldDelete = await showDeleteDialog(context);
+                  if (shouldDelete ?? false) {
+                    onDeleteNote(note);
+                  }
+                },
+              ),
             ),
           );
         }));
