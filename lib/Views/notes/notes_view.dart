@@ -5,7 +5,6 @@ import 'dart:developer' as devtools show log;
 
 import 'package:noting/constants/routes.dart';
 import 'package:noting/services/auth/auth_service.dart';
-import 'package:noting/services/cloud/cloud_storage_constants.dart';
 import 'package:noting/services/cloud/firebase_cloud_storage.dart';
 
 import '../../enums/menu_action.dart';
@@ -33,6 +32,14 @@ class _NotesViewState extends State<NotesView> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AppRoutes.createUpdate,
+              );
+            },
+            icon: const Icon(Icons.add),
+          ),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -45,19 +52,11 @@ class _NotesViewState extends State<NotesView> {
                     );
                   }
                   break;
-                case MenuAction.addEditNote:
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.createUpdate,
-                  );
-                  break;
+                  default: break;
               }
             },
             itemBuilder: (context) {
               return const [
-                PopupMenuItem(
-                  value: MenuAction.addEditNote,
-                  child: Text('Add note'),
-                ),
                 PopupMenuItem(
                   value: MenuAction.logOut,
                   child: Text('Log out'),
@@ -74,7 +73,6 @@ class _NotesViewState extends State<NotesView> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              break;
             case ConnectionState.active:
               {
                 if (snapshot.hasData) {
@@ -96,10 +94,7 @@ class _NotesViewState extends State<NotesView> {
                 }
               }
               break;
-            case ConnectionState.none:
-              break;
-            case ConnectionState.done:
-              break;
+              default: break;
           }
           return const Center(child: CircularProgressIndicator());
         },

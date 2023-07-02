@@ -91,8 +91,33 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       appBar: AppBar(
         title: _note == null
             ? const Text('New note')
-            : Text(_note!.content.substring(0, 10)),
+            : _note!.content.isEmpty
+                ? const Text('')
+                : Text(_note!.content.substring(0, 10)),
       ),
+      body: FutureBuilder(
+          future: createOrGetExistingNote(context),
+          builder: ((context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                _note = snapshot.data as CloudNote;
+                _setupTextControlListener();
+
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                  child: TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    controller: _textController,
+                    decoration: const InputDecoration(
+                        hintText: 'Start typing your note'),
+                  ),
+                );
+              default:
+                return const CircularProgressIndicator();
+            }
+          })),
     );
   }
 }
