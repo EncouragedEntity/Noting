@@ -45,10 +45,9 @@ class _NotesViewState extends State<NotesView> {
                     );
                   }
                   break;
-                case MenuAction.addNote:
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                case MenuAction.addEditNote:
+                  Navigator.of(context).pushNamed(
                     AppRoutes.createUpdate,
-                    (route) => false,
                   );
                   break;
               }
@@ -56,7 +55,7 @@ class _NotesViewState extends State<NotesView> {
             itemBuilder: (context) {
               return const [
                 PopupMenuItem(
-                  value: MenuAction.addNote,
+                  value: MenuAction.addEditNote,
                   child: Text('Add note'),
                 ),
                 PopupMenuItem(

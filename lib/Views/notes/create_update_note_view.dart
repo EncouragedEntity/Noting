@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:noting/services/auth/auth_service.dart';
 import 'package:noting/services/cloud/cloud_note.dart';
 import 'package:noting/services/cloud/firebase_cloud_storage.dart';
@@ -22,11 +22,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     super.initState();
   }
 
-  void _setupTextControlListener()
-  {
+  void _setupTextControlListener() {
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
-
   }
 
   void _textControllerListener() async {
@@ -36,7 +34,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final note = _note;
     final text = _textController.text;
 
-    await _notesService.updateNote(documentId: note!.documentId, newContent: text);
+    await _notesService.updateNote(
+        documentId: note!.documentId, newContent: text);
   }
 
   Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
@@ -83,11 +82,17 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _deleteNoteIfTextEmpty();
     _saveNoteIfTextNotEmpty();
     _textController.dispose();
-    super.dispose();    
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: _note == null
+            ? const Text('New note')
+            : Text(_note!.content.substring(0, 10)),
+      ),
+    );
   }
 }
