@@ -4,7 +4,6 @@ import 'package:noting/services/cloud/cloud_note.dart';
 import 'package:noting/services/cloud/firebase_cloud_storage.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../constants/notes.dart';
 import '../../utilities/dialogs/cannot_share_empy_note_dialog.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
