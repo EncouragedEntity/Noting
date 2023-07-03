@@ -9,6 +9,7 @@ import 'package:noting/services/cloud/firebase_cloud_storage.dart';
 
 import '../../enums/menu_action.dart';
 import '../../services/cloud/cloud_note.dart';
+import '../../utilities/dialogs/log_out_dialog.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -44,7 +45,7 @@ class _NotesViewState extends State<NotesView> {
             onSelected: (value) async {
               switch (value) {
                 case MenuAction.logOut:
-                  if (await showLogOutDialog(context)) {
+                  if (await LogOutDialog().show(context)) {
                     await AuthService.firebase().logOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.login,
@@ -113,28 +114,5 @@ class _NotesViewState extends State<NotesView> {
     );
   }
 
-  Future<bool> showLogOutDialog(BuildContext context) {
-    return showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Log out'),
-            content: const Text('Are you sure you want to log out?'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: const Text('Log out'),
-              )
-            ],
-          );
-        }).then((value) => value ?? false);
-  }
+  
 }

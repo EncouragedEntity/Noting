@@ -4,6 +4,7 @@ import 'package:noting/services/cloud/cloud_note.dart';
 import 'package:noting/services/cloud/firebase_cloud_storage.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../constants/notes.dart';
 import '../../utilities/dialogs/cannot_share_empy_note_dialog.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
@@ -92,21 +93,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _note == null
-            ? const Text('New note')
-            : _note!.content.isEmpty
-                ? const Text('')
-                : Text(_note!.content.substring(0, 10)),
+        title: const Text('Your note'),
         actions: [
           IconButton(
             onPressed: () async {
               final text = _textController.text;
-              if(_note==null || text.isEmpty)
-              {
+              if (_note == null || text.isEmpty) {
                 await CannotShareEmptyNoteDialog().show(context);
-              }
-              else
-              {
+              } else {
                 Share.share(text);
               }
             },
