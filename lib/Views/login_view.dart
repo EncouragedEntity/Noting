@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/constants/routes.dart';
 import 'package:noting/services/auth/auth_exception.dart';
-import 'package:noting/services/auth/auth_service.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
 import 'package:noting/services/auth/bloc/auth_event.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import '../constants/colors.dart';
+import '../services/auth/bloc/auth_state.dart';
+import '../utilities/generics/generic_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -73,59 +74,62 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
               const SizedBox(height: 24),
-              FormButton(
-                  text: "Login",
-                  isSecondary: false,
-                  onPressed: () async {
-                    final email = _emailController.text;
-                    final password = _passwordController.text;
-
-                    try {
-                      if (email.isEmpty) {
-                        throw EmptyMailException();
-                      }
-
-                      if (password.isEmpty) {
-                        throw EmptyPasswordException();
-                      }
-
-                      context.read<AuthBloc>().add(AuthLogInEvent(
-                            email,
-                            password,
-                          ));
-                    } on EmptyMailException {
+              BlocListener<AuthBloc, AuthState>(
+                listener: (context, state) async {
+                  if (state is AuthLoggedOutState) {
+                    if (state.exception is EmptyMailException) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Email cannot be empty"),
                         ),
                       );
-                    } on EmptyPasswordException {
+                    }
+
+                    if (state.exception is EmptyPasswordException) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Password cannot be empty"),
                         ),
                       );
-                    } on InvalidMailException {
+                    }
+
+                    if (state.exception is UserNotFoundException) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
                               "There is no user with that email. Try to create one"),
                         ),
                       );
-                    } on WrongPasswordException {
+                    }
+                    if (state.exception is WrongPasswordException) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Wrong password. Try again"),
                         ),
                       );
-                    } on GenericException {
+                    }
+
+                    if (state.exception is GenericException) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Authentication error"),
                         ),
                       );
                     }
-                  }),
+                  }
+                },
+                child: FormButton(
+                    text: "Login",
+                    isSecondary: false,
+                    onPressed: () async {
+                      final email = _emailController.text;
+                      final password = _passwordController.text;
+                      context.read<AuthBloc>().add(AuthLogInEvent(
+                            email,
+                            password,
+                          ));
+                    }),
+              ),
               const SizedBox(height: 8),
               FormButton(
                 isSecondary: true,

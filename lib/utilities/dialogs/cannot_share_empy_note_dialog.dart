@@ -7,7 +7,6 @@ class CannotShareEmptyNoteDialog {
       context: context,
       title: 'Sharing',
       content: 'You cannot share an empty note!',
-      optionsBuilder: () => {'OK': null},
     );
   }
 }

@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 
 class FirebaseAuthProvider implements AuthProvider {
-
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -58,6 +57,13 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
   }) async {
     try {
+      if (email.isEmpty) {
+        throw EmptyMailException();
+      }
+      if(password.isEmpty)
+      {
+        throw EmptyPasswordException();
+      }
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -68,31 +74,32 @@ class FirebaseAuthProvider implements AuthProvider {
       }
       return user;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'empty-email') {
-        throw EmptyMailException();
-      } else if (e.code == 'empty-password') {
-        throw EmptyPasswordException();
-      } else if (e.code == 'user-not-found') {
+      if (e.code == 'user-not-found') {
         throw UserNotFoundException();
       } else if (e.code == 'wrong-password') {
         throw WrongPasswordException();
       } else {
         throw GenericException();
       }
-    } catch (_) {
-        throw GenericException();
+    } catch (e) {
+      if(e is EmptyMailException)
+      {
+        throw EmptyMailException();
+      }
+      if(e is EmptyPasswordException)
+      {
+        throw EmptyPasswordException();
+      }
+      throw GenericException();
     }
   }
 
   @override
   Future<void> logOut() async {
     final user = FirebaseAuth.instance.currentUser;
-    if(user != null)
-    {
+    if (user != null) {
       await FirebaseAuth.instance.signOut();
-    }
-    else
-    {
+    } else {
       throw UserNotLoggedInException();
     }
   }
@@ -106,7 +113,7 @@ class FirebaseAuthProvider implements AuthProvider {
       throw UserNotLoggedInException();
     }
   }
-  
+
   @override
   Future<void> initialize() async {
     await Firebase.initializeApp(
