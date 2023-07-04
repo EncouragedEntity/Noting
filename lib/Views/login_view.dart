@@ -19,7 +19,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-  CloseDialog? _closeDialogHandle;
 
   @override
   void initState() {
@@ -40,18 +39,6 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthLoggedOutState) {
-          final closeDialog = _closeDialogHandle;
-
-          if (!state.isLoading && closeDialog != null) {
-            closeDialog();
-            _closeDialogHandle = null;
-          } else if (state.isLoading && closeDialog == null) {
-            _closeDialogHandle = showLoadingDialog(
-              context: context,
-              text: "Loading...",
-            );
-          }
-
           if (state.exception is EmptyMailException) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

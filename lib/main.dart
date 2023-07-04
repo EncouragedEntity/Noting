@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/constants/colors.dart';
+import 'package:noting/helpers/loading/loading_screen.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
 import 'package:noting/services/auth/bloc/auth_event.dart';
 import 'package:noting/services/auth/bloc/auth_state.dart';
@@ -53,7 +54,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<AuthBloc>().add(const AuthInitializeEvent());
 
-    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+    return BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
+      if (state.isLoading) {
+        LoadingScreen()
+            .show(context: context, text: state.loadingText ?? 'Wait a sec...');
+      } else {
+        LoadingScreen().hide();
+      }
+    }, builder: (context, state) {
       if (state is AuthRegisteringState) {
         return const RegisterView();
       }
