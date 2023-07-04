@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/services/auth/auth_exception.dart';
 import 'package:noting/services/auth/auth_service.dart';
+import 'package:noting/services/auth/bloc/auth_bloc.dart';
+import 'package:noting/services/auth/bloc/auth_event.dart';
 
-import '../constants/routes.dart';
 import '../widgets/form_button.dart';
 
 class VerifyEmailView extends StatefulWidget {
@@ -28,12 +30,9 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               isSecondary: false,
               onPressed: () async {
                 try {
-                  await AuthService.firebase().sendEmailVerification();
+                  context.read<AuthBloc>().add(const AuthSendEmailVerificationEvent());
                 } on UserNotFoundException {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.login,
-                      (route) => false,
-                    );
+                    context.read<AuthBloc>().add(const AuthLogOutEvent());
                 }
               },
             ),
@@ -41,10 +40,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               child: const Text('Restart'),
               onPressed: () async {
                 await AuthService.firebase().logOut();
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.register,
-                  (route) => false,
-                );
+                context.read<AuthBloc>().add(const AuthShouldRegisterEvent());
               },
             ),
           ],

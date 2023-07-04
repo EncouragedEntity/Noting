@@ -41,10 +41,6 @@ void main() async {
       child: HomePage(),
     ),
     routes: {
-      AppRoutes.login: (context) => const LoginView(),
-      AppRoutes.register: (context) => const RegisterView(),
-      AppRoutes.notes: (context) => const NotesView(),
-      AppRoutes.mailVerify: (context) => const VerifyEmailView(),
       AppRoutes.createUpdate: (context) => const CreateUpdateNoteView(),
     },
   ));
@@ -58,6 +54,10 @@ class HomePage extends StatelessWidget {
     context.read<AuthBloc>().add(const AuthInitializeEvent());
 
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      if (state is AuthRegisteringState) {
+        return const RegisterView();
+      }
+
       if (state is AuthLoggedInState) {
         return const NotesView();
       }

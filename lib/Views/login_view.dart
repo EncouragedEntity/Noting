@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noting/constants/routes.dart';
 import 'package:noting/services/auth/auth_exception.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
 import 'package:noting/services/auth/bloc/auth_event.dart';
+import 'package:noting/utilities/dialogs/loading_dialog.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import '../constants/colors.dart';
 import '../services/auth/bloc/auth_state.dart';
@@ -19,6 +19,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  CloseDialog? _closeDialogHandle;
 
   @override
   void initState() {
@@ -36,88 +37,100 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Container(
-        color: AppColors.background,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: ListView(
-            children: [
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: _emailController,
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthLoggedOutState) {
+          final closeDialog = _closeDialogHandle;
+
+          if (!state.isLoading && closeDialog != null) {
+            closeDialog();
+            _closeDialogHandle = null;
+          } else if (state.isLoading && closeDialog == null) {
+            _closeDialogHandle = showLoadingDialog(
+              context: context,
+              text: "Loading...",
+            );
+          }
+
+          if (state.exception is EmptyMailException) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Email cannot be empty"),
+              ),
+            );
+          }
+
+          if (state.exception is EmptyPasswordException) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Password cannot be empty"),
+              ),
+            );
+          }
+
+          if (state.exception is UserNotFoundException) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content:
+                    Text("There is no user with that email. Try to create one"),
+              ),
+            );
+          }
+          if (state.exception is WrongPasswordException) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Wrong password. Try again"),
+              ),
+            );
+          }
+
+          if (state.exception is GenericException) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Authentication error"),
+              ),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Login')),
+        body: Container(
+          color: AppColors.background,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: ListView(
+              children: [
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _emailController,
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                keyboardType: TextInputType.visiblePassword,
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 16),
+                TextFormField(
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.visiblePassword,
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              BlocListener<AuthBloc, AuthState>(
-                listener: (context, state) async {
-                  if (state is AuthLoggedOutState) {
-                    if (state.exception is EmptyMailException) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Email cannot be empty"),
-                        ),
-                      );
-                    }
-
-                    if (state.exception is EmptyPasswordException) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Password cannot be empty"),
-                        ),
-                      );
-                    }
-
-                    if (state.exception is UserNotFoundException) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              "There is no user with that email. Try to create one"),
-                        ),
-                      );
-                    }
-                    if (state.exception is WrongPasswordException) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Wrong password. Try again"),
-                        ),
-                      );
-                    }
-
-                    if (state.exception is GenericException) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Authentication error"),
-                        ),
-                      );
-                    }
-                  }
-                },
-                child: FormButton(
+                const SizedBox(height: 24),
+                FormButton(
                     text: "Login",
                     isSecondary: false,
                     onPressed: () async {
@@ -128,19 +141,18 @@ class _LoginViewState extends State<LoginView> {
                             password,
                           ));
                     }),
-              ),
-              const SizedBox(height: 8),
-              FormButton(
-                isSecondary: true,
-                text: "Create new account",
-                onPressed: () async {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutes.register,
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 8),
+                FormButton(
+                  isSecondary: true,
+                  text: "Create new account",
+                  onPressed: () {
+                    context
+                        .read<AuthBloc>()
+                        .add(const AuthShouldRegisterEvent());
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
