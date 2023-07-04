@@ -8,7 +8,6 @@ import 'package:noting/services/auth/bloc/auth_event.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import '../constants/colors.dart';
 import '../services/auth/bloc/auth_state.dart';
-import '../utilities/generics/generic_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
