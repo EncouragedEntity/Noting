@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors, avoid_printRegisterView
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/constants/colors.dart';
 import 'package:noting/services/auth/auth_service.dart';
+import 'package:noting/services/auth/bloc/auth_bloc.dart';
+import 'package:noting/services/auth/firebase_auth_provider.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import 'Views/all_views.dart';
 import 'constants/routes.dart';
@@ -33,7 +36,10 @@ void main() async {
     theme: ThemeData(
       primarySwatch: customPrimarySwatch,
     ),
-    home: const HomePage(),
+    home: BlocProvider<AuthBloc>(
+      create: (context) => AuthBloc(FirebaseAuthProvider()),
+      child: HomePage(),
+    ),
     routes: {
       AppRoutes.login: (context) => const LoginView(),
       AppRoutes.register: (context) => const RegisterView(),
@@ -42,14 +48,13 @@ void main() async {
       AppRoutes.createUpdate: (context) => const CreateUpdateNoteView(),
     },
   ));
-} 
+}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     final authService = AuthService.firebase();
 
     return FutureBuilder(
