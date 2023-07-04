@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/constants/colors.dart';
-import 'package:noting/services/auth/auth_service.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
+import 'package:noting/services/auth/bloc/auth_event.dart';
+import 'package:noting/services/auth/bloc/auth_state.dart';
 import 'package:noting/services/auth/firebase_auth_provider.dart';
-import 'package:noting/widgets/all_widgets.dart';
 import 'Views/all_views.dart';
 import 'constants/routes.dart';
 // ignore: unused_import
@@ -55,27 +55,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = AuthService.firebase();
+    context.read<AuthBloc>().add(const AuthInitializeEvent());
 
-    return FutureBuilder(
-      future: authService.initialize(),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            final user = authService.currentUser;
-            if (user != null) {
-              if (user.isEmailVerified) {
-                return const NotesView();
-              } else {
-                return const VerifyEmailView();
-              }
-            } else {
-              return const LoginView();
-            }
-          default:
-            return SplashScreen();
-        }
-      },
-    );
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      if (state is AuthLoggedInState) {
+        return const NotesView();
+      }
+      if (state is AuthNeedsVerificationState) {
+        return const VerifyEmailView();
+      }
+      if (state is AuthLoggedOutState) {
+        return const LoginView();
+      }
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    });
   }
 }
