@@ -1,8 +1,11 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/constants/routes.dart';
 import 'package:noting/services/auth/auth_exception.dart';
 import 'package:noting/services/auth/auth_service.dart';
+import 'package:noting/services/auth/bloc/auth_bloc.dart';
+import 'package:noting/services/auth/bloc/auth_event.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import '../constants/colors.dart';
 
@@ -90,11 +93,11 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-
   void handleLogin() async {
     final authService = AuthService.firebase();
     final email = _emailController.text;
     final password = _passwordController.text;
+
     try {
       if (email.isEmpty) {
         throw EmptyMailException();
@@ -104,10 +107,11 @@ class _LoginViewState extends State<LoginView> {
         throw EmptyPasswordException();
       }
 
-      await authService.logIn(
-        email: email,
-        password: password,
+      final event = AuthLogInEvent(
+        email,
+        password,
       );
+      context.read<AuthBloc>().add(event);
 
       final user = authService.currentUser;
 
