@@ -60,8 +60,7 @@ class FirebaseAuthProvider implements AuthProvider {
       if (email.isEmpty) {
         throw EmptyMailException();
       }
-      if(password.isEmpty)
-      {
+      if (password.isEmpty) {
         throw EmptyPasswordException();
       }
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -82,12 +81,10 @@ class FirebaseAuthProvider implements AuthProvider {
         throw GenericException();
       }
     } catch (e) {
-      if(e is EmptyMailException)
-      {
+      if (e is EmptyMailException) {
         throw EmptyMailException();
       }
-      if(e is EmptyPasswordException)
-      {
+      if (e is EmptyPasswordException) {
         throw EmptyPasswordException();
       }
       throw GenericException();
@@ -119,5 +116,23 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
+
+  @override
+  Future<void> sendPasswordReset({required String toEmail}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: toEmail);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'auth/invalid-email':
+          throw InvalidMailException();
+        case 'auth/user-not-found':
+          throw UserNotFoundException();
+        default:
+          throw GenericException();
+      }
+    } catch (_) {
+      throw GenericException();
+    }
   }
 }

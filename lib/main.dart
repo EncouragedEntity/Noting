@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, avoid_printRegisterView
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noting/Views/forgot_password_view.dart';
 import 'package:noting/constants/colors.dart';
 import 'package:noting/helpers/loading/loading_screen.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
@@ -74,6 +75,10 @@ class HomePage extends StatelessWidget {
       }
       if (state is AuthLoggedOutState) {
         return const LoginView();
+      }
+      if(state is AuthForgotPasswordState)
+      {
+        return const ForgotPasswordView();
       }
       return const Scaffold(
         body: Center(

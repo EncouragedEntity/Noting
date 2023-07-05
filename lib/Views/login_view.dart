@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noting/services/auth/auth_exception.dart';
 import 'package:noting/services/auth/bloc/auth_bloc.dart';
 import 'package:noting/services/auth/bloc/auth_event.dart';
-import 'package:noting/utilities/dialogs/loading_dialog.dart';
 import 'package:noting/widgets/all_widgets.dart';
 import '../constants/colors.dart';
 import '../services/auth/bloc/auth_state.dart';
@@ -125,7 +124,7 @@ class _LoginViewState extends State<LoginView> {
                       final password = _passwordController.text;
                       context.read<AuthBloc>().add(AuthLogInEvent(
                             email,
-                            password,
+                            password, 
                           ));
                     }),
                 const SizedBox(height: 8),
@@ -138,8 +137,14 @@ class _LoginViewState extends State<LoginView> {
                         .add(const AuthShouldRegisterEvent());
                   },
                 ),
+                TextButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(const AuthForgotPasswordEvent());
+                  },
+                  child: const Text('I forgot password. Silly me'),
+                ),
               ],
-            ),
+            ), 
           ),
         ),
       ),
