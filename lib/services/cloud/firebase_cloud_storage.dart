@@ -73,7 +73,7 @@ class FirebaseCloudStorage {
       }
 
       final notesSnapshot =
-          await notes.where('userId', isEqualTo: user.uid).get();
+          await notes.where('user_id', isEqualTo: user.uid).get();
 
       if (notesSnapshot.docs.isEmpty) {
         return;
