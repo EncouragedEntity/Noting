@@ -12,7 +12,6 @@ import 'Views/all_views.dart';
 import 'constants/routes.dart';
 // ignore: unused_import
 import 'dart:developer' as devtools show log;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

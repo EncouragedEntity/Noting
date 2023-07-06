@@ -1,5 +1,0 @@
-flutter_native_splash:
-  image: android\app\src\main\res\drawable\logo.png  # Path to your splash screen image
-  color: "#ec9d75"  # Background color of the splash screen
-  fill: false  # Whether to stretch the image to fill the screen
-  android_gravity: center  # Positioning of the splash screen on Android
