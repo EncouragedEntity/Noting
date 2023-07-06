@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:noting/services/auth/auth_exception.dart';
 import 'package:noting/services/cloud/cloud_note.dart';
 import 'package:noting/services/cloud/cloud_storage_constants.dart';
 import 'package:noting/services/cloud/cloud_storage_exceptions.dart';
@@ -8,7 +10,7 @@ class FirebaseCloudStorage {
 
   Stream<Iterable<CloudNote>> getAllNotes({required String ownerUserId}) =>
       notes.snapshots().map((event) => event.docs
-          .map((doc) => CloudNote.fromSnapshot(doc)) 
+          .map((doc) => CloudNote.fromSnapshot(doc))
           .where((note) => note.ownerUserId == ownerUserId));
 
   Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
@@ -64,25 +66,30 @@ class FirebaseCloudStorage {
   }
 
   Future<void> deleteAllNotes() async {
-  try {
-    final notesSnapshot = await notes.get();
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw UserNotFoundException();
+      }
 
-    if (notesSnapshot.docs.isEmpty) {
-      return;
+      final notesSnapshot =
+          await notes.where('userId', isEqualTo: user.uid).get();
+
+      if (notesSnapshot.docs.isEmpty) {
+        return;
+      }
+
+      final batch = FirebaseFirestore.instance.batch();
+
+      for (final noteDoc in notesSnapshot.docs) {
+        batch.delete(noteDoc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      throw CouldNotDeleteNoteException();
     }
-
-    final batch = FirebaseFirestore.instance.batch();
-
-    for (final noteDoc in notesSnapshot.docs) {
-      batch.delete(noteDoc.reference);
-    }
-
-    await batch.commit();
-  } catch (e) {
-    throw CouldNotDeleteNoteException();
   }
-}
-
 
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
