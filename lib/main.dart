@@ -12,6 +12,7 @@ import 'Views/all_views.dart';
 import 'constants/routes.dart';
 // ignore: unused_import
 import 'dart:developer' as devtools show log;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,19 +33,21 @@ void main() async {
     },
   );
 
-  runApp(MaterialApp(
-    title: 'Noting',
-    theme: ThemeData(
-      primarySwatch: customPrimarySwatch,
+  runApp(
+    MaterialApp(
+      title: 'Noting',
+      theme: ThemeData(
+        primarySwatch: customPrimarySwatch,
+      ),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: HomePage(),
+      ),
+      routes: {
+        AppRoutes.createUpdate: (context) => const CreateUpdateNoteView(),
+      },
     ),
-    home: BlocProvider<AuthBloc>(
-      create: (context) => AuthBloc(FirebaseAuthProvider()),
-      child: HomePage(),
-    ),
-    routes: {
-      AppRoutes.createUpdate: (context) => const CreateUpdateNoteView(),
-    },
-  ));
+  );
 }
 
 class HomePage extends StatelessWidget {
@@ -75,8 +78,7 @@ class HomePage extends StatelessWidget {
       if (state is AuthLoggedOutState) {
         return const LoginView();
       }
-      if(state is AuthForgotPasswordState)
-      {
+      if (state is AuthForgotPasswordState) {
         return const ForgotPasswordView();
       }
       return const Scaffold(
